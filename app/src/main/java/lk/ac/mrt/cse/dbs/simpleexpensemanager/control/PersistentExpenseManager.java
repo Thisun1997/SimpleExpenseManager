@@ -12,7 +12,7 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.impl.PersistentTransactionDAO
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Account;
 
 public class PersistentExpenseManager extends ExpenseManager{
-    private Context context;
+    final Context context;
     public PersistentExpenseManager(Context context) {
         setup();
         this.context = context;
@@ -23,8 +23,8 @@ public class PersistentExpenseManager extends ExpenseManager{
         /*** Begin generating dummy data for In-Memory implementation ***/
         //System.out.println("jj");
         MyDBHandler mydbhandler = new MyDBHandler(context);
-//        PersistableBundle PersistentTransactionDAO = new PersistentTransactionDAO(mydbhandler);
-//        setTransactionsDAO(inMemoryTransactionDAO);
+        TransactionDAO persistentTransactionDAO = new PersistentTransactionDAO(mydbhandler);
+        setTransactionsDAO(persistentTransactionDAO);
 
         AccountDAO persistentAccountDAO = new PersistentAccountDAO(mydbhandler);
         setAccountsDAO(persistentAccountDAO);

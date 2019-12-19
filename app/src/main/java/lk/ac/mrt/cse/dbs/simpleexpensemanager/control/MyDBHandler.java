@@ -6,12 +6,16 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.exception.InvalidAccountException;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Account;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Transaction;
 
 public class MyDBHandler extends SQLiteOpenHelper {
     //information of database
@@ -29,6 +33,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_T2 = "type";
     public static final String COLUMN_T3 = "amount";
     public static final String COLUMN_T4 = "date";
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat();
 
     //initialize the database
     public MyDBHandler(Context context) {
@@ -48,7 +54,11 @@ public class MyDBHandler extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int i, int i1) {}
+    public void onUpgrade(SQLiteDatabase db, int i, int i1) {
+        db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME_ACCOUNT);
+        db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME_TRANSACTION);
+        onCreate(db);
+    }
 
     public void addAccount(Account account) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -142,9 +152,69 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
     }
 
-//    public String loadHandler() {}
-//    public void addHandler(Student student) {}
-//    public Student findHandler(String studentname) {}
-//    public boolean deleteHandler(int ID) {}
-//    public boolean updateHandler(int ID, String name) {}
+    public void logTransaction(Date date, String accountNo, ExpenseType expenseType, double amount) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        Transaction transaction = new Transaction(date, accountNo, expenseType, amount);
+        contentValues.put(COLUMN_T1, transaction.getAccountNo());
+        contentValues.put(COLUMN_T2, String.valueOf(transaction.getExpenseType()));
+        contentValues.put(COLUMN_T4, transaction.getAmount());
+        contentValues.put(COLUMN_T3, dateFormat.format(transaction.getDate()));
+        db.insert(TABLE_NAME_TRANSACTION, null, contentValues);
+    }
+
+    public List<Transaction> getAllTransactionLogs() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<Transaction> transaction_list = new ArrayList<Transaction>();
+        Cursor res = db.rawQuery( "select * from "+ TABLE_NAME_TRANSACTION , null );
+        res.moveToFirst();
+        try {
+            while(res.isAfterLast() == false) {
+                String account_no = res.getString(0);
+                Double amount = res.getDouble(2);
+                Date date = null;
+
+                    date = new SimpleDateFormat("dd/mm/yyyy").parse(res.getString(3));
+                String expense_type_db = res.getString(1);
+                ExpenseType expenseType = ExpenseType.EXPENSE;
+                if(expense_type_db.equals("INCOME")){
+                    expenseType = ExpenseType.INCOME;
+                }
+                Transaction transaction = new Transaction(date,account_no,expenseType,amount);
+                transaction_list.add(transaction);
+                res.moveToNext();
+                }
+        }catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return transaction_list;
+    }
+
+    public List<Transaction> getPaginatedTransactionLogs(int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<Transaction> transaction_list = new ArrayList<Transaction>();
+        Cursor res = db.rawQuery( "select * from "+TABLE_NAME_TRANSACTION+" order by "+COLUMN_T4+" desc limit ?",new String[]{Integer.toString(limit)});
+        res.moveToFirst();
+        try {
+            while(res.isAfterLast() == false) {
+                String account_no = res.getString(0);
+                Double amount = res.getDouble(2);
+                Date date = null;
+
+                date = new SimpleDateFormat("dd/mm/yyyy").parse(res.getString(3));
+                String expense_type_db = res.getString(1);
+                ExpenseType expenseType = ExpenseType.EXPENSE;
+                if (expense_type_db.equals("INCOME")) {
+                    expenseType = ExpenseType.INCOME;
+                }
+                Transaction transaction = new Transaction(date, account_no, expenseType, amount);
+                transaction_list.add(transaction);
+                res.moveToNext();
+            }
+        }catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return transaction_list;
+    }
+
 }
