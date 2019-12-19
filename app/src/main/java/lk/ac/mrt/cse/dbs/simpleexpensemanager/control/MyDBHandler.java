@@ -45,11 +45,11 @@ public class MyDBHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_TABLE_ACCOUNT = "CREATE TABLE " + TABLE_NAME_ACCOUNT + "(" + COLUMN_A1 +
-                "TEXT PRIMARYKEY," + COLUMN_A2 + "TEXT," + COLUMN_A3 + "TEXT," + COLUMN_A4 + "FLOAT )";
+                " TEXT PRIMARY KEY, " + COLUMN_A2 + " TEXT, " + COLUMN_A3 + " TEXT, " + COLUMN_A4 + " REAL )";
         db.execSQL(CREATE_TABLE_ACCOUNT);
 
         String CREATE_TABLE_TRANSACTION = "CREATE TABLE " + TABLE_NAME_TRANSACTION + "(" + COLUMN_T1 +
-                "TEXT PRIMARYKEY," + COLUMN_T2 + "TEXT," + COLUMN_T3 + "FLOAT," + COLUMN_T4 + "DATE )";
+                " TEXT PRIMARY KEY, " + COLUMN_T2 + " TEXT," + COLUMN_T3 + " FLOAT, " + COLUMN_T4 + " DATE )";
         db.execSQL(CREATE_TABLE_TRANSACTION);
     }
 

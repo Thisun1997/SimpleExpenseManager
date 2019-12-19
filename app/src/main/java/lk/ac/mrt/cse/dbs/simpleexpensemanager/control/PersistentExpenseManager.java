@@ -14,14 +14,13 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Account;
 public class PersistentExpenseManager extends ExpenseManager{
     final Context context;
     public PersistentExpenseManager(Context context) {
-        setup();
         this.context = context;
+        setup();
     }
 
     @Override
     public void setup() {
         /*** Begin generating dummy data for In-Memory implementation ***/
-        //System.out.println("jj");
         MyDBHandler mydbhandler = new MyDBHandler(context);
         TransactionDAO persistentTransactionDAO = new PersistentTransactionDAO(mydbhandler);
         setTransactionsDAO(persistentTransactionDAO);
