@@ -19,8 +19,8 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Transaction;
 
 public class MyDBHandler extends SQLiteOpenHelper {
     //information of database
-    private static final int DATABASE_VERSION = 2;
-    private static final String DATABASE_NAME = "projectDB.db";
+    private static final int DATABASE_VERSION = 3;
+    private static final String DATABASE_NAME = "170098U.db";
 
     public static final String TABLE_NAME_ACCOUNT = "Account_table";
     public static final String COLUMN_A1 = "accountNo";
@@ -38,7 +38,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
     //initialize the database
     public MyDBHandler(Context context) {
-        super(context, DATABASE_NAME, null, 2);
+        super(context, DATABASE_NAME, null, 3);
     }
 
 
@@ -49,7 +49,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_ACCOUNT);
 
         String CREATE_TABLE_TRANSACTION = "CREATE TABLE " + TABLE_NAME_TRANSACTION + "(" + COLUMN_T1 +
-                " TEXT PRIMARY KEY, " + COLUMN_T2 + " TEXT," + COLUMN_T3 + " FLOAT, " + COLUMN_T4 + " DATE )";
+                " TEXT, " + COLUMN_T2 + " TEXT," + COLUMN_T3 + " FLOAT, " + COLUMN_T4 + " DATE )";
         db.execSQL(CREATE_TABLE_TRANSACTION);
     }
 
@@ -172,9 +172,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
             while(res.isAfterLast() == false) {
                 String account_no = res.getString(0);
                 Double amount = res.getDouble(2);
-                Date date = null;
-
-                    date = new SimpleDateFormat("dd/mm/yyyy").parse(res.getString(3));
+                Date date = new SimpleDateFormat("dd/mm/yyyy").parse(res.getString(3));
                 String expense_type_db = res.getString(1);
                 ExpenseType expenseType = ExpenseType.EXPENSE;
                 if(expense_type_db.equals("INCOME")){
